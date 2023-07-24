@@ -1,24 +1,46 @@
 import Genres from "../assets/genres.json";
 import Genre from "./Genre";
+import Popup from "./Popup";
+import "./Genreslist.css";
 import { useState, useEffect } from "react";
 
 const Genreslist = () => {
   const [selectedRow, setselectedRow] = useState(0);
+  const [focusedMovie, setFocusedMovie] = useState(
+    Array(Genres.length).fill(0)
+  );
+  const [popup, setPopup] = useState(false);
+  const [popupMovie, setpopupMovie] = useState();
+
+  const handlePopupOpening = (title, backdrop, voteAverage, overview) => {
+    setPopup(true);
+    setpopupMovie({ title, backdrop, voteAverage, overview });
+  };
+
+  const handlePopupClosing = () => {
+    setPopup(false);
+  };
 
   const downArrowHandler = () => {
     setselectedRow((prevState) => prevState + 1);
-    window.scrollTo(
-      window.pageXOffset,
-      window.pageYOffset + window.innerHeight * 0.35
-    );
+    window.scrollTo(window.pageXOffset, window.pageYOffset + 424);
   };
 
   const upArrowHandler = () => {
     setselectedRow((prevState) => prevState - 1);
-    window.scrollTo(
-      window.pageXOffset,
-      window.pageYOffset - window.innerHeight * 0.38
-    );
+    window.scrollTo(window.pageXOffset, window.pageYOffset - 424);
+  };
+
+  const rightArrowHandler = () => {
+    const updatedFocus = [...focusedMovie];
+    updatedFocus[selectedRow]++;
+    setFocusedMovie(updatedFocus);
+  };
+
+  const leftArrowHandler = () => {
+    const updatedFocus = [...focusedMovie];
+    updatedFocus[selectedRow]--;
+    setFocusedMovie(updatedFocus);
   };
 
   useEffect(() => {
@@ -27,6 +49,10 @@ const Genreslist = () => {
         downArrowHandler();
       } else if (event.key === "ArrowUp" && selectedRow > 0) {
         upArrowHandler();
+      } else if (event.key === "ArrowLeft" && focusedMovie[selectedRow] > 0) {
+        leftArrowHandler();
+      } else if (event.key === "ArrowRight" && focusedMovie[selectedRow] < 19) {
+        rightArrowHandler();
       }
     };
 
@@ -35,10 +61,12 @@ const Genreslist = () => {
     return () => {
       document.removeEventListener("keydown", keyDownHandler);
     };
-  }, [selectedRow]);
+  }, [selectedRow, focusedMovie]);
+
+  const imgURL = "https://image.tmdb.org/t/p/w500";
 
   return (
-    <div className="my-5 mt-[70px] text-lg bg-[#0F1626] text-[#F5F5F5]">
+    <div className="genres">
       {Genres.map((genre, index) => {
         return (
           <Genre
@@ -46,9 +74,20 @@ const Genreslist = () => {
             name={genre.name}
             id={genre.id}
             activeRow={selectedRow === index}
+            activeMovie={focusedMovie[index]}
+            onPopup={handlePopupOpening}
+            onEscape={handlePopupClosing}
           />
         );
       })}
+      {popup && (
+        <Popup
+          title={popupMovie.title}
+          image={imgURL + popupMovie.backdrop}
+          voteAverage={popupMovie.voteAverage}
+          overview={popupMovie.overview}
+        />
+      )}
     </div>
   );
 };
