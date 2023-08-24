@@ -1,11 +1,35 @@
 import { signInWithEmailAndPassword } from "firebase/auth";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { auth } from "../../firebase.js";
+import './Login.css'
 
 const Login = (props) => {
   const mailRef = useRef();
   const passwordRef = useRef();
+  const buttonRef = useRef();
   const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    mailRef.current.focus();
+  }, []);
+
+  const handleKeyDown = (event) => {
+    if (event.key === "ArrowDown") {
+      if (document.activeElement === mailRef.current) {
+        passwordRef.current.focus();
+      } else if (document.activeElement === passwordRef.current) {
+        buttonRef.current.focus();
+      }
+    } else if (event.key === "ArrowUp") {
+      if (document.activeElement === buttonRef.current) {
+        passwordRef.current.focus();
+      } else if (document.activeElement === passwordRef.current) {
+        mailRef.current.focus();
+      }
+    } else if (event.key === "Enter") {
+      loginFn();
+    }
+  };
 
   const loginFn = async (e) => {
     e.preventDefault();
@@ -28,18 +52,21 @@ const Login = (props) => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <div className="text-2xl font-bold mb-4 text-[#F5F5F5]">Please sign in.</div>
-      <form className="space-y-4">
+    <div className="login-container">
+      <div className="login-text">
+        Please sign in.
+      </div>
+      <form>
         <div>
           <label htmlFor="mail"></label>
           <input
             type="text"
             id="mail"
             required
-            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#E50914]"
+            className="input-field"
             placeholder="Email"
             ref={mailRef}
+            onKeyDown={handleKeyDown}
           ></input>
         </div>
         <div>
@@ -49,17 +76,20 @@ const Login = (props) => {
             id="password"
             required
             placeholder="Password"
-            className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#E50914]"
+            className="input-field"
             ref={passwordRef}
+            onKeyDown={handleKeyDown}
           ></input>
         </div>
         <button
           onClick={loginFn}
-          className="w-full py-2 px-4 bg-[#F5F5F5] text-[#000000] rounded-md hover:bg-[#E50914] hover:text-[#F5F5F5] transition-colors"
+          className="button"
+          ref={buttonRef}
+          onKeyDown={handleKeyDown}
         >
           Log in
         </button>
-        {errorMessage && <p className="text-red-500 mb-4">{errorMessage}</p>}
+        {errorMessage && <p className="error-msg">{errorMessage}</p>}
       </form>
     </div>
   );

@@ -1,31 +1,30 @@
 import Genres from "../assets/genres.json";
 import Genre from "./Genre";
+import Popup from "./Popup";
+import "./Genreslist.css";
 import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+
 
 const Genreslist = () => {
-  const [selectedRow, setselectedRow] = useState(0);
+  const [focusedRow, setFocusedRow] = useState(0);
+  const popup = useSelector((state) => state.popup.isOpen);
 
   const downArrowHandler = () => {
-    setselectedRow((prevState) => prevState + 1);
-    window.scrollTo(
-      window.pageXOffset,
-      window.pageYOffset + window.innerHeight * 0.35
-    );
+    setFocusedRow((prevState) => prevState + 1);
+    window.scrollTo(window.pageXOffset, window.pageYOffset + 424);
   };
 
   const upArrowHandler = () => {
-    setselectedRow((prevState) => prevState - 1);
-    window.scrollTo(
-      window.pageXOffset,
-      window.pageYOffset - window.innerHeight * 0.38
-    );
+    setFocusedRow((prevState) => prevState - 1);
+    window.scrollTo(window.pageXOffset, window.pageYOffset - 424);
   };
 
   useEffect(() => {
     const keyDownHandler = (event) => {
-      if (event.key === "ArrowDown" && selectedRow < Genres.length - 1) {
+      if (event.key === "ArrowDown" && focusedRow < Genres.length - 1) {
         downArrowHandler();
-      } else if (event.key === "ArrowUp" && selectedRow > 0) {
+      } else if (event.key === "ArrowUp" && focusedRow > 0) {
         upArrowHandler();
       }
     };
@@ -35,20 +34,21 @@ const Genreslist = () => {
     return () => {
       document.removeEventListener("keydown", keyDownHandler);
     };
-  }, [selectedRow]);
+  }, [focusedRow]);
 
   return (
-    <div className="my-5 mt-[70px] text-lg bg-[#0F1626] text-[#F5F5F5]">
+    <div className="genres">
       {Genres.map((genre, index) => {
         return (
           <Genre
             key={genre.id}
             name={genre.name}
             id={genre.id}
-            activeRow={selectedRow === index}
+            focusedRow={focusedRow === index}
           />
         );
       })}
+      {popup && <Popup />}
     </div>
   );
 };

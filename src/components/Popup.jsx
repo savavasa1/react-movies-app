@@ -1,19 +1,26 @@
 import React from "react";
 import { FaStar } from "react-icons/fa";
+import './Popup.css'
+import { useDispatch, useSelector } from "react-redux";
 
 const Popup = (props) => {
+  const {isOpen, title, backdrop, voteAverage, overview} = useSelector((state) => state.popup);
+  const dispatch = useDispatch();
+
+  const imgURL = `https://image.tmdb.org/t/p/w500${backdrop}`;
+
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-80">
-      <div className="bg-[#0F1626] w-80 rounded-lg p-2 shadow-lg overflow-hidden">
-        <div className="relative">
-          <img className="w-full h-48 object-cover" src={props.image} />
-          <div className="absolute bottom-2 right-2 flex items-center space-x-1 bg-black text-white px-2 py-1 rounded">
-            <FaStar className="text-yellow-400" />
-            <div>{props.voteAverage}/10</div>
+    <div className="popup-background">
+      <div className="popup-container">
+        <div style={{position: "relative"}}>
+          <img className="popup-image" src={imgURL} />
+          <div className="popup-rating">
+            <FaStar className="star-color" />
+            <div>{voteAverage}/10</div>
           </div>
         </div>
-        <div className="text-xl font-bold mb-2">{props.title}</div>
-        <div className=" text-sm text-[#F5F5F5] mb-4">{props.overview}</div>
+        <div className="popup-title">{title}</div>
+        <div className=" popup-text">{overview}</div>
       </div>
     </div>
   );
