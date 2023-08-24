@@ -1,25 +1,39 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Movie from "./Movie";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchMovies } from "../features/movies/moviesSlice";
 
 const Movieslist = (props) => {
-  const [activeMovie, setActiveMovie] = useState(0);
+  const [horizontalOffset, setHorizontalOffset] = useState(0);
+  const rowRef = useRef();
+  const dispatch = useDispatch();
+  const movies = useSelector((state) => state.movies.movies[props.id]?.results);
+  const [focusedMovie, setFocusedMovie] = useState(0);
+
+  useEffect(() => {
+    if (focusedMovie < movies?.length - 8)
+    setHorizontalOffset(props.focusedRow && 219 * focusedMovie)
+   // setHorizontalOffset(props.focusedRow && Math.min(Math.max(focusedMovie * 219, 0), 2559));
+  }, [focusedMovie, props.focusedRow, movies]);
+
+  useEffect(() => {
+    dispatch(fetchMovies(props.id));
+  }, [dispatch, props.id]);
 
   const rightArrowHandler = () => {
-    setActiveMovie((prevState) => prevState + 1);
-    window.scrollTo(window.pageXOffset + 42, window.pageYOffset);
+    setFocusedMovie((prevState) => prevState + 1);
   };
 
   const leftArrowHandler = () => {
-    setActiveMovie((prevState) => prevState - 1);
-    window.scrollTo(window.pageXOffset - 42, window.pageYOffset);
+    setFocusedMovie((prevState) => prevState - 1);
   };
 
-   useEffect(() => {
+  useEffect(() => {
     const keyDownHandler = (event) => {
-      if (event.key === "ArrowRight" && activeMovie < props.movies.length - 1) {
-        rightArrowHandler();
-      } else if (event.key === "ArrowLeft" && activeMovie > 0) {
+      if (event.key === "ArrowLeft" && focusedMovie > 0) {
         leftArrowHandler();
+      } else if (event.key === "ArrowRight" && focusedMovie < 19) {
+        rightArrowHandler();
       }
     };
 
@@ -28,20 +42,26 @@ const Movieslist = (props) => {
     return () => {
       document.removeEventListener("keydown", keyDownHandler);
     };
-  }, [props.movies, activeMovie]);
+  }, [focusedMovie]);
 
   return (
-    <div className="flex">
-      {props.movies?.map((movie, index) => {
+    <div
+      ref={rowRef}
+      style={{
+        display: "flex",
+        transform: `translateX(${-horizontalOffset}px)`,
+      }}
+    >
+      {movies?.map((movie, index) => {
         return (
-          <div className="m-1 w-[200px] flex-none" key={movie.id}>
+          <div key={movie.id}>
             <Movie
               title={movie.title}
               posterPath={movie.poster_path}
               backdrop={movie.backdrop_path}
-              activeMovie={activeMovie === index}
-              movieId={movie.id}
-              activeRow={props.activeRow}
+              movieIndex={index}
+              focusedMovie={focusedMovie}
+              focusedRow={props.focusedRow}
               voteAverage={movie.vote_average}
               overview={movie.overview}
             />
