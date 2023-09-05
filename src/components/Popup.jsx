@@ -1,18 +1,18 @@
 import React from "react";
 import { FaStar } from "react-icons/fa";
-import './Popup.css'
-import { useDispatch, useSelector } from "react-redux";
+import "./Popup.css";
+import { observer } from "mobx-react-lite";
+import PopupStore from "./PopupStore";
 
-const Popup = (props) => {
-  const {isOpen, title, backdrop, voteAverage, overview} = useSelector((state) => state.popup);
-  const dispatch = useDispatch();
+const Popup = observer(() => {
+  const { title, backdrop, voteAverage, overview } = PopupStore;
 
   const imgURL = `https://image.tmdb.org/t/p/w500${backdrop}`;
 
   return (
     <div className="popup-background">
       <div className="popup-container">
-        <div style={{position: "relative"}}>
+        <div style={{ position: "relative" }}>
           <img className="popup-image" src={imgURL} />
           <div className="popup-rating">
             <FaStar className="star-color" />
@@ -24,6 +24,6 @@ const Popup = (props) => {
       </div>
     </div>
   );
-};
+});
 
 export default Popup;

@@ -3,29 +3,47 @@ import Genre from "./Genre";
 import Popup from "./Popup";
 import "./Genreslist.css";
 import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import PopupStore from "./PopupStore";
+import { observer } from "mobx-react-lite";
 
-
-const Genreslist = () => {
-  const [focusedRow, setFocusedRow] = useState(0);
-  const popup = useSelector((state) => state.popup.isOpen);
-
+const Genreslist = observer(() => {
+  const [selectedRow, setselectedRow] = useState(0);
+  const [focusedMovie, setFocusedMovie] = useState(
+    Array(Genres.length).fill(0)
+  );
+  
   const downArrowHandler = () => {
-    setFocusedRow((prevState) => prevState + 1);
+    setselectedRow((prevState) => prevState + 1);
     window.scrollTo(window.pageXOffset, window.pageYOffset + 424);
   };
 
   const upArrowHandler = () => {
-    setFocusedRow((prevState) => prevState - 1);
+    setselectedRow((prevState) => prevState - 1);
     window.scrollTo(window.pageXOffset, window.pageYOffset - 424);
+  };
+
+  const rightArrowHandler = () => {
+    const updatedFocus = [...focusedMovie];
+    updatedFocus[selectedRow]++;
+    setFocusedMovie(updatedFocus);
+  };
+
+  const leftArrowHandler = () => {
+    const updatedFocus = [...focusedMovie];
+    updatedFocus[selectedRow]--;
+    setFocusedMovie(updatedFocus);
   };
 
   useEffect(() => {
     const keyDownHandler = (event) => {
-      if (event.key === "ArrowDown" && focusedRow < Genres.length - 1) {
+      if (event.key === "ArrowDown" && selectedRow < Genres.length - 1) {
         downArrowHandler();
-      } else if (event.key === "ArrowUp" && focusedRow > 0) {
+      } else if (event.key === "ArrowUp" && selectedRow > 0) {
         upArrowHandler();
+      } else if (event.key === "ArrowLeft" && focusedMovie[selectedRow] > 0) {
+        leftArrowHandler();
+      } else if (event.key === "ArrowRight" && focusedMovie[selectedRow] < 19) {
+        rightArrowHandler();
       }
     };
 
@@ -34,7 +52,7 @@ const Genreslist = () => {
     return () => {
       document.removeEventListener("keydown", keyDownHandler);
     };
-  }, [focusedRow]);
+  }, [selectedRow, focusedMovie]);
 
   return (
     <div className="genres">
@@ -44,13 +62,14 @@ const Genreslist = () => {
             key={genre.id}
             name={genre.name}
             id={genre.id}
-            focusedRow={focusedRow === index}
+            activeRow={selectedRow === index}
+            activeMovie={focusedMovie[index]}
           />
         );
       })}
-      {popup && <Popup />}
+      {PopupStore.isOpen && <Popup />}
     </div>
   );
-};
+});
 
 export default Genreslist;

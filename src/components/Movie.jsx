@@ -1,26 +1,23 @@
 import React, { useEffect } from "react";
 import "./Movie.css";
-import { useDispatch, useSelector } from "react-redux";
-import { closePopup, openPopup } from "../features/movies/popupSlice";
+import PopupStore from "./PopupStore";
+import { observer } from "mobx-react-lite";
 
-const Movie = (props) => {
+const Movie = observer((props) => {
   const imgURL = "https://image.tmdb.org/t/p/w500";
-  const activated = props.focusedMovie === props.movieIndex && props.focusedRow;
-  const dispatch = useDispatch();
+  const activated = props.activeMovie && props.activeRow;
 
   useEffect(() => {
     const keyDownHandler = (event) => {
       if (event.key === "Enter" && activated) {
-        dispatch(
-          openPopup({
-            title: props.title,
-            backdrop: props.backdrop,
-            voteAverage: props.voteAverage,
-            overview: props.overview,
-          })
+        PopupStore.setPopupOpen(
+          props.title,
+          props.backdrop,
+          props.voteAverage,
+          props.overview
         );
-      } else if (event.key === "Escape") {
-        dispatch(closePopup());
+      } else if (event.key === "Escape" && activated) {
+        PopupStore.setPopupClose()
       }
     };
 
@@ -50,6 +47,6 @@ const Movie = (props) => {
       </div>
     </div>
   );
-};
+});
 
 export default Movie;
