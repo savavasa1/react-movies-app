@@ -1,23 +1,33 @@
 import React, { useEffect } from "react";
 import "./Movie.css";
-import PopupStore from "./PopupStore";
-import { observer } from "mobx-react-lite";
+import { useRecoilState } from "recoil";
+import { popupState } from "./PopupState";
 
-const Movie = observer((props) => {
+const Movie = (props) => {
   const imgURL = "https://image.tmdb.org/t/p/w500";
   const activated = props.activeMovie && props.activeRow;
+  const [popup, setPopup] = useRecoilState(popupState)
 
   useEffect(() => {
     const keyDownHandler = (event) => {
       if (event.key === "Enter" && activated) {
-        PopupStore.setPopupOpen(
-          props.title,
-          props.backdrop,
-          props.voteAverage,
-          props.overview
-        );
+        const popupData = {
+          isShown: true,
+          title: props.title,
+          backdrop: props.backdrop,
+          voteAverage: props.voteAverage,
+          overview: props.overview        
+        };
+        setPopup(popupData)
       } else if (event.key === "Escape" && activated) {
-        PopupStore.setPopupClose()
+        const popupData = {
+          isShown: false,
+          title: '',
+          backdrop: '',
+          voteAverage: '',
+          overview: ''
+        }
+        setPopup(popupData)
       }
     };
 
@@ -47,6 +57,6 @@ const Movie = observer((props) => {
       </div>
     </div>
   );
-});
+};
 
 export default Movie;

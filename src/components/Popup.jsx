@@ -1,29 +1,29 @@
 import React from "react";
 import { FaStar } from "react-icons/fa";
-import "./Popup.css";
-import { observer } from "mobx-react-lite";
-import PopupStore from "./PopupStore";
+import './Popup.css'
+import { useRecoilValue } from "recoil";
+import { popupState } from "./PopupState";
 
-const Popup = observer(() => {
-  const { title, backdrop, voteAverage, overview } = PopupStore;
+const Popup = (props) => {
 
-  const imgURL = `https://image.tmdb.org/t/p/w500${backdrop}`;
+  const popup = useRecoilValue(popupState);
 
+  const imgURL = `https://image.tmdb.org/t/p/w500${popup.backdrop}`; 
   return (
     <div className="popup-background">
       <div className="popup-container">
-        <div style={{ position: "relative" }}>
+        <div style={{position: "relative"}}>
           <img className="popup-image" src={imgURL} />
           <div className="popup-rating">
             <FaStar className="star-color" />
-            <div>{voteAverage}/10</div>
+            <div>{popup.voteAverage}/10</div>
           </div>
         </div>
-        <div className="popup-title">{title}</div>
-        <div className=" popup-text">{overview}</div>
+        <div className="popup-title">{popup.title}</div>
+        <div className=" popup-text">{popup.overview}</div>
       </div>
     </div>
   );
-});
+};
 
 export default Popup;

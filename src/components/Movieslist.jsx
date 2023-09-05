@@ -1,15 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
 import Movie from "./Movie";
-import MoviesStore from "./MoviesStore";
-import { observer } from "mobx-react-lite";
+import { useRecoilValue } from "recoil";
+import { MoviesState } from "./MoviesState";
 
-const Movieslist = observer((props) => {
+const Movieslist = (props) => {
   const [horizontalOffset, setHorizontalOffset] = useState(0);
   const rowRef = useRef();
+  const movies = useRecoilValue(MoviesState)
 
   useEffect(() => {
     setHorizontalOffset(Math.min(Math.max(props.activeMovie * 219, 0), 2559));
   }, [props.activeMovie]);
+
 
   return (
     <div
@@ -19,7 +21,7 @@ const Movieslist = observer((props) => {
         transform: `translateX(${-horizontalOffset}px)`,
       }}
     >
-      {MoviesStore.movies[props.id]?.map((movie, index) => {
+      {movies[props.id]?.map((movie, index) => {
         return (
           <div key={movie.id}>
             <Movie
@@ -37,6 +39,6 @@ const Movieslist = observer((props) => {
       })}
     </div>
   );
-});
+};
 
 export default Movieslist;
