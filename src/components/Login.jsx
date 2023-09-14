@@ -1,13 +1,18 @@
-import { signInWithEmailAndPassword } from "firebase/auth";
-import React, { useEffect, useRef, useState } from "react";
-import { auth } from "../../firebase.js";
-import './Login.css'
+import React, { useEffect, useRef } from "react";
+import "./Login.css";
+import { useMutation } from "@tanstack/react-query";
+import loginMutation from "./loginMutation";
 
 const Login = (props) => {
   const mailRef = useRef();
   const passwordRef = useRef();
   const buttonRef = useRef();
-  const [errorMessage, setErrorMessage] = useState("");
+  const { mutate, error, isError} = useMutation({
+    mutationFn: loginMutation,
+    onSuccess: () => {
+      props.onLogin();
+    }
+  });
 
   useEffect(() => {
     mailRef.current.focus();
@@ -27,35 +32,23 @@ const Login = (props) => {
         mailRef.current.focus();
       }
     } else if (event.key === "Enter") {
-      loginFn();
+      loginHandler();
     }
   };
 
-  const loginFn = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await signInWithEmailAndPassword(
-        auth,
-        mailRef.current.value,
-        passwordRef.current.value
-      );
-      props.onLogin();
-      const accessToken = response.user.accessToken;
-      localStorage.setItem("accessToken", accessToken);
-    } catch (error) {
-      if (error.code === "auth/wrong-password") {
-        setErrorMessage("Your password is incorrect. Please try again.");
-      } else if (error.code === "auth/user-not-found") {
-        setErrorMessage("Account with this email does not exist.");
-      }
-    }
+  const loginHandler = async (event) => {
+    event.preventDefault();
+    const data = {
+      email: mailRef.current.value,
+      password: passwordRef.current.value,
+    };
+
+    await mutate(data);
   };
 
   return (
     <div className="login-container">
-      <div className="login-text">
-        Please sign in.
-      </div>
+      <div className="login-text">Please sign in.</div>
       <form>
         <div>
           <label htmlFor="mail"></label>
@@ -82,14 +75,14 @@ const Login = (props) => {
           ></input>
         </div>
         <button
-          onClick={loginFn}
+          onClick={loginHandler}
           className="button"
           ref={buttonRef}
           onKeyDown={handleKeyDown}
         >
           Log in
         </button>
-        {errorMessage && <p className="error-msg">{errorMessage}</p>}
+        {isError && <p className="error-msg">{error.message}</p>}
       </form>
     </div>
   );

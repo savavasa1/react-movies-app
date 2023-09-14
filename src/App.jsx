@@ -4,7 +4,7 @@ import Login from "./components/Login";
 
 
 function App() {
-  const [loggedIn, setLoggedIn] = useState(true);
+  const [loggedIn, setLoggedIn] = useState(false);
 
   const handleLogin = () => {
     setLoggedIn(true);

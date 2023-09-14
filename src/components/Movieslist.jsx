@@ -16,7 +16,6 @@ const Movieslist = observer((props) => {
     setHorizontalOffset(Math.min(Math.max(props.activeMovie * 219, 0), 2559));
   }, [props.activeMovie]);
 
-  console.log(data)
   return (
     <div
       ref={rowRef}
