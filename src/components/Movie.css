@@ -1,0 +1,25 @@
+.movie {
+  margin: 5px;
+  width: 209px;
+  flex: none;
+}
+
+.movie-poster {
+  width: 209px;
+  height: 291px;
+}
+
+.movie-poster.active {
+  width: 209px;
+  height: 291px;
+  border-width: 3px;
+  border-color: #ffffff;
+  border-radius: 5px;
+}
+
+.movie-name {
+  max-width: 209px;
+  object-fit: contain;
+  height: 90px;
+  font-size: 20px;
+}
